@@ -48,12 +48,12 @@
           "signatures": null,
           "targets": [
             {
-              "version": "4.0.01.0813.02",
+              "version": "4.0.02.0903.02",
               "versionCodes": {
-                "ARM64_V8A": 50020121,
-                "ARMEABI_V7A": 50020121,
-                "X86_64": 50020121,
-                "X86": 50020121
+                "ARM64_V8A": 50020903,
+                "ARMEABI_V7A": 50020903,
+                "X86_64": 50020903,
+                "X86": 50020903
               },
               "isExperimental": false,
               "minSdk": null,
