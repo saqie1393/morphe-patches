@@ -9,25 +9,14 @@ import app.template.patches.shared.clearBody
 import com.android.tools.smali.dexlib2.Opcode
 
 // ═══════════════════════════════════════════════════════════════════
-//  MovieBox Phone v4.0.02.0903.02 (UPDATED)
+//  MovieBox Phone v4.0.02.0903.02 (FINAL UPDATED)
 // ═══════════════════════════════════════════════════════════════════
 //
-// Updated based on smali analysis (v4.0.02.0903.02):
-//   MemberProvider.B()Z  → isActive (was c)
-//   MemberProvider.h()Z  → kv_is_pay_enable_member (was f)
-//   MemberProvider.g()Z  → kv_is_skip_ad (unchanged)
-//   MemberProvider.z(F)V → showMemberDialog (was x)
-//   MemberProvider.D()I  → parallel_download_task_num (unchanged)
-//   PremiumProvider.b()Z → isActive (was c)
-//   PremiumProvider.j()Z → isVip (was k)
-//   PremiumProvider.u()Z → isSVip (unchanged)
-//   PremiumProvider.n()Ljava/lang/Integer; → daysLeft (was o)
-//   PremiumProvider.f()I → free_download_count (unchanged)
-//   PremiumProvider.h()I → per_download_resource_count (was i)
-//   PremiumProvider.t()I → max_resolution (unchanged)
-//   PremiumProvider.w()I → preview_seconds (unchanged)
-//   PremiumProvider.x()I → free_hd_preview_count (unchanged)
-//   NationalInformationManager.e()Ljava/lang/String; → unchanged
+// All classes verified from smali:
+//   MemberProvider: B()Z, h()Z, g()Z, z(F)V, D()I
+//   PremiumProvider: b()Z, j()Z, u()Z, n()Integer, f()I, h()I, t()I, w()I, x()I
+//   NationalInformationManager: e()String
+//   MemberInfo, MemberBriefInfo, MemberResolutionBean, PremiumV2CheckAccessDto: all same
 
 @Suppress("unused")
 val movieBoxPhonePatch = bytecodePatch(
@@ -57,8 +46,17 @@ val movieBoxPhonePatch = bytecodePatch(
         """.trimIndent()
 
         // ─── MemberCheckResult — server membership response ───────────
-        var cls = mutableClassDefByOrNull("Lcom/transsion/memberapi/MemberCheckResult;")
-            ?: throw PatchException("MemberCheckResult not found")
+        // Universal search for MemberCheckResult
+        var cls: ClassDef? = null
+        val checkResultPaths = listOf(
+            "Lcom/transsion/memberapi/MemberCheckResult;",
+            "Lcom/transsion/member/MemberCheckResult;"
+        )
+        for (path in checkResultPaths) {
+            cls = mutableClassDefByOrNull(path)
+            if (cls != null) break
+        }
+        cls = cls ?: throw PatchException("MemberCheckResult not found")
         for (name in listOf("isPassed", "getVipEnable", "getVipPayEnable")) {
             cls.methods.firstOrNull {
                 it.name == name && it.returnType == "Ljava/lang/Boolean;" && it.parameterTypes.isEmpty()
@@ -67,8 +65,18 @@ val movieBoxPhonePatch = bytecodePatch(
         }
 
         // ─── MemberInfo — full member detail bean ────────────────────
-        cls = mutableClassDefByOrNull("Lcom/transsion/memberapi/MemberInfo;")
-            ?: throw PatchException("MemberInfo not found")
+        // Universal search for MemberInfo
+        cls = null
+        val memberInfoPaths = listOf(
+            "Lcom/transsion/memberapi/MemberInfo;",
+            "Lcom/transsion/member/MemberInfo;"
+        )
+        for (path in memberInfoPaths) {
+            cls = mutableClassDefByOrNull(path)
+            if (cls != null) break
+        }
+        cls = cls ?: throw PatchException("MemberInfo not found")
+        
         cls.methods.firstOrNull {
             it.name == "isActive" && it.returnType == "Z" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, returnTrue)
@@ -89,8 +97,17 @@ val movieBoxPhonePatch = bytecodePatch(
         }?.addInstructions(0, "const-string v0, \"2099-12-31\"\nreturn-object v0")
 
         // ─── MemberBriefInfo — lightweight member summary bean ────────
-        cls = mutableClassDefByOrNull("Lcom/transsion/member/bean/MemberBriefInfo;")
-            ?: throw PatchException("MemberBriefInfo not found")
+        cls = null
+        val briefInfoPaths = listOf(
+            "Lcom/transsion/member/bean/MemberBriefInfo;",
+            "Lcom/transsion/memberapi/MemberBriefInfo;"
+        )
+        for (path in briefInfoPaths) {
+            cls = mutableClassDefByOrNull(path)
+            if (cls != null) break
+        }
+        cls = cls ?: throw PatchException("MemberBriefInfo not found")
+        
         cls.methods.firstOrNull {
             it.name == "isActive" && it.returnType == "Z" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, returnTrue)
