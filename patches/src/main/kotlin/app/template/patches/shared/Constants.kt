@@ -996,14 +996,14 @@ val MONET_COMPATIBILITY = Compatibility(
     )
 
 val MOVIEBOX_COMPATIBILITY = Compatibility(
-        name = "MovieBox",
-        packageName = "com.community.oneroom",
-        apkFileType = ApkFileType.APK,
-        appIconColor = 0xE53935,
-        targets = listOf(
-            AppTarget(version = "4.0.01.0813.02", versionCode = 50020121)
-        )
+    name = "MovieBox",
+    packageName = "com.community.oneroom",
+    apkFileType = ApkFileType.APK,
+    appIconColor = 0xE53935,
+    targets = listOf(
+        AppTarget(version = "4.0.02.0903.02", versionCode = 50020903)
     )
+)
 
 val MOVIEBOX_TV_COMPATIBILITY = Compatibility(
         name = "MovieBox TV",
