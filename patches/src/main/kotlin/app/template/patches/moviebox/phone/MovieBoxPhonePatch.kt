@@ -34,7 +34,7 @@ val movieBoxPhonePatch = bytecodePatch(
             return-object v0
         """.trimIndent()
 
-        // ─── MemberCheckResult ───────────────────────────
+        // ─── MemberCheckResult (smali_classes7) ──────────
         val memberCheckResult = mutableClassDefByOrNull("Lcom/transsion/memberapi/MemberCheckResult;")
             ?: throw PatchException("MemberCheckResult not found")
         for (name in listOf("isPassed", "getVipEnable", "getVipPayEnable")) {
@@ -44,7 +44,7 @@ val movieBoxPhonePatch = bytecodePatch(
                 ?: throw PatchException("MemberCheckResult.$name() not found")
         }
 
-        // ─── MemberInfo ──────────────────────────────────
+        // ─── MemberInfo (smali_classes7) ──────────────────
         val memberInfo = mutableClassDefByOrNull("Lcom/transsion/memberapi/MemberInfo;")
             ?: throw PatchException("MemberInfo not found")
         memberInfo.methods.firstOrNull {
@@ -66,7 +66,7 @@ val movieBoxPhonePatch = bytecodePatch(
             it.name == "getNextRenewDate" && it.returnType == "Ljava/lang/String;" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, "const-string v0, \"2099-12-31\"\nreturn-object v0")
 
-        // ─── MemberBriefInfo ─────────────────────────────
+        // ─── MemberBriefInfo (smali_classes7) ─────────────
         val memberBriefInfo = mutableClassDefByOrNull("Lcom/transsion/member/bean/MemberBriefInfo;")
             ?: throw PatchException("MemberBriefInfo not found")
         memberBriefInfo.methods.firstOrNull {
@@ -79,7 +79,7 @@ val movieBoxPhonePatch = bytecodePatch(
             it.name == "getExpiryDate" && it.returnType == "Ljava/lang/String;" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, "const-string v0, \"2099-12-31\"\nreturn-object v0")
 
-        // ─── MemberProvider ──────────────────────────────
+        // ─── MemberProvider (smali) ──────────────────────
         val memberProvider = mutableClassDefByOrNull("Lcom/transsion/member/MemberProvider;")
             ?: throw PatchException("MemberProvider not found")
 
@@ -103,7 +103,7 @@ val movieBoxPhonePatch = bytecodePatch(
             ?.addInstructions(0, "const/4 v0, 0x5\nreturn v0")
             ?: throw PatchException("MemberProvider.parallel_download (D()I) not found")
 
-        // ─── PremiumProvider ──────────────────────────────
+        // ─── PremiumProvider (smali_classes7) ──────────────
         val premiumProvider = mutableClassDefByOrNull("Lcom/transsion/member/premium/PremiumProvider;")
             ?: throw PatchException("PremiumProvider not found")
 
@@ -143,7 +143,7 @@ val movieBoxPhonePatch = bytecodePatch(
             ?.addInstructions(0, returnIntMax)
             ?: throw PatchException("PremiumProvider.free_hd_preview_count (x()I) not found")
 
-        // ─── NationalInformationManager ──────────────────
+        // ─── NationalInformationManager (smali_classes7) ──
         val nationalInfo = mutableClassDefByOrNull("Lcom/transsion/ad/strategy/NationalInformationManager;")
             ?: throw PatchException("NationalInformationManager not found")
         nationalInfo.methods.firstOrNull {
@@ -151,7 +151,7 @@ val movieBoxPhonePatch = bytecodePatch(
         }?.addInstructions(0, "const-string v0, \"90101\"\nreturn-object v0")
             ?: throw PatchException("NationalInformationManager.e() not found")
 
-        // ─── ObserveLoginAction ──────────────────────────
+        // ─── ObserveLoginAction (smali) ────────────────────
         val observeLogin = mutableClassDefByOrNull("Lcom/transsion/member/ObserveLoginAction;")
             ?: throw PatchException("ObserveLoginAction not found")
         observeLogin.methods.firstOrNull {
@@ -159,7 +159,7 @@ val movieBoxPhonePatch = bytecodePatch(
         }?.apply { clearBody(); addInstructions(0, "return-void") }
             ?: throw PatchException("ObserveLoginAction.onLogout()V not found")
 
-        // ─── PremiumV2CheckAccessDto ─────────────────────
+        // ─── PremiumV2CheckAccessDto (smali_classes7) ─────
         val premiumV2 = mutableClassDefByOrNull("Lcom/transsion/memberapi/PremiumV2CheckAccessDto;")
             ?: throw PatchException("PremiumV2CheckAccessDto not found")
         premiumV2.methods.firstOrNull {
@@ -167,7 +167,7 @@ val movieBoxPhonePatch = bytecodePatch(
         }?.addInstructions(0, returnBoxedTrue)
             ?: throw PatchException("PremiumV2CheckAccessDto.getHasAccess() not found")
 
-        // ─── MemberResolutionBean ────────────────────────
+        // ─── MemberResolutionBean (smali_classes7) ────────
         val resolutionBean = mutableClassDefByOrNull("Lcom/transsion/baselib/db/member/MemberResolutionBean;")
             ?: throw PatchException("MemberResolutionBean not found")
         resolutionBean.methods.firstOrNull {
@@ -214,7 +214,7 @@ val movieBoxPhonePatch = bytecodePatch(
                 }?.addInstructions(0, "const/4 v0, 0x0\nreturn v0")
         }
 
-        // ─── AppLifeStatusInterceptor ────────────────────
+        // ─── AppLifeStatusInterceptor (smali) ─────────────
         val interceptor = mutableClassDefByOrNull("Lcom/transsion/baselib/net/AppLifeStatusInterceptor;")
             ?: throw PatchException("AppLifeStatusInterceptor not found")
         interceptor.methods.firstOrNull {
@@ -247,7 +247,7 @@ val movieBoxPhonePatch = bytecodePatch(
                     ?.addInstructions(0, returnFalse)
             }
 
-        // ─── SceneInterceptManager ───────────────────────
+        // ─── SceneInterceptManager (smali_classes7) ──────
         mutableClassDefByOrNull("Lcom/transsion/ad/scene/SceneInterceptManager;")
             ?.methods?.firstOrNull {
                 it.name == "a" && it.returnType == "Ljava/lang/Object;" &&
