@@ -93,7 +93,7 @@ Bug reports must include:
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v1.21.4](https://github.com/rushiranpise/morphe-patches/releases/tag/v1.21.4)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**334 patches** across **235 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.0.0](https://github.com/saqie1393/morphe-patches/releases/tag/v1.0.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**334 patches** across **235 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
@@ -221,7 +221,7 @@ Bug reports must include:
 | 122 | [**Monet**](PATCHES.md#monet-comklevicomonet) | 1 | `v1.0.76` | [`com.klevico.monet`](https://play.google.com/store/apps/details?id=com.klevico.monet) |
 | 123 | [**Money Manager**](PATCHES.md#money-manager-comglgjingmoneymanagerbookkeepingmeow) | 1 | `1.9.9` | [`com.glgjing.money.manager.bookkeeping.meow`](https://play.google.com/store/apps/details?id=com.glgjing.money.manager.bookkeeping.meow) |
 | 124 | [**Moovit**](PATCHES.md#moovit-comtranzmate) | 1 | `5.197.1.1801` | [`com.tranzmate`](https://play.google.com/store/apps/details?id=com.tranzmate) |
-| 125 | [**MovieBox**](PATCHES.md#moviebox-comcommunityoneroom) | 1 | `4.0.01.0813.02` | [`com.community.oneroom`](https://play.google.com/store/apps/details?id=com.community.oneroom) |
+| 125 | [**MovieBox**](PATCHES.md#moviebox-comcommunityoneroom) | 1 | `4.0.02.0903.02` | [`com.community.oneroom`](https://play.google.com/store/apps/details?id=com.community.oneroom) |
 | 126 | [**MovieBox India**](PATCHES.md#moviebox-india-comcommunitymboxin) | 1 | `3.0.13.0402.02` | [`com.community.mbox.in`](https://play.google.com/store/apps/details?id=com.community.mbox.in) |
 | 127 | [**MovieBox TV**](PATCHES.md#moviebox-tv-comcommunitymboxtv) | 1 | `1.1.9.0820.03` | [`com.community.mbox.tv`](https://play.google.com/store/apps/details?id=com.community.mbox.tv) |
 | 128 | [**MyAnimeList**](PATCHES.md#myanimelist-netmyanimelistapp) | 1 | `2.3.16` | [`net.myanimelist.app`](https://play.google.com/store/apps/details?id=net.myanimelist.app) |

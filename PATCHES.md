@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` — **v1.21.4** (`main`) · **334 patches** across **235 apps** · back to [README](README.md)
+> Generated from `patches-list.json` — **v1.0.0** (`main`) · **334 patches** across **235 apps** · back to [README](README.md)
 
 ---
 
@@ -1285,7 +1285,7 @@
 
 ## MovieBox (com.community.oneroom)
 
-**Supported versions:** `4.0.01.0813.02`
+**Supported versions:** `4.0.02.0903.02`
 
 | Patch | Details |
 |---|---|
