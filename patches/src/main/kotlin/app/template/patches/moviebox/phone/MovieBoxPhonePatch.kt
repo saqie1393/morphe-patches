@@ -9,25 +9,25 @@ import app.template.patches.shared.clearBody
 import com.android.tools.smali.dexlib2.Opcode
 
 // ═══════════════════════════════════════════════════════════════════
-//  MovieBox Phone  (com.community.oneroom)  v4.0.01.0813.02
+//  MovieBox Phone v4.0.02.0903.02 (UPDATED)
 // ═══════════════════════════════════════════════════════════════════
 //
-// All non-obfuscated stable names verified from smali.
-// Obfuscated names (R8-assigned, pinned by class+return+params):
-//   MemberProvider.c()Z          — isActive wrapper
-//   MemberProvider.f()Z          — kv_is_pay_enable_member
-//   MemberProvider.g()Z          — kv_is_skip_ad
-//   MemberProvider.x(F)V         — showMemberDialog / upsell popup
-//   MemberProvider.D()I          — kv_parallel_download_task_num
-//   NationalInformationManager.e() — sp_code reader (country code)
-//   AppLifeStatusInterceptor.i(S,S)V — dialog-style region popup
-//   AppLifeStatusInterceptor.j(S,S)V — TheRouter page_not_available route
-//   AppLifeStatusInterceptor.k(S)V   — TheRouter redirect
-//   AppLifeStatusInterceptor.n(Chain)Z — OkHttp freeze flag setter
-//   MemberResolutionDao$DefaultImpls.b() — updateVipResolutionTipOrCreate
-//   PremiumProvider.c/k/u/o/f/i/t/w/x — entitlement methods
-//   ShortTVItem.getNeedPaid()I    — live stream paywall gate (stable name)
-//   com.transsion.shorttv.bean.Subject.getNeedPaid()I — same
+// Updated based on smali analysis (v4.0.02.0903.02):
+//   MemberProvider.B()Z  → isActive (was c)
+//   MemberProvider.h()Z  → kv_is_pay_enable_member (was f)
+//   MemberProvider.g()Z  → kv_is_skip_ad (unchanged)
+//   MemberProvider.z(F)V → showMemberDialog (was x)
+//   MemberProvider.D()I  → parallel_download_task_num (unchanged)
+//   PremiumProvider.b()Z → isActive (was c)
+//   PremiumProvider.j()Z → isVip (was k)
+//   PremiumProvider.u()Z → isSVip (unchanged)
+//   PremiumProvider.n()Ljava/lang/Integer; → daysLeft (was o)
+//   PremiumProvider.f()I → free_download_count (unchanged)
+//   PremiumProvider.h()I → per_download_resource_count (was i)
+//   PremiumProvider.t()I → max_resolution (unchanged)
+//   PremiumProvider.w()I → preview_seconds (unchanged)
+//   PremiumProvider.x()I → free_hd_preview_count (unchanged)
+//   NationalInformationManager.e()Ljava/lang/String; → unchanged
 
 @Suppress("unused")
 val movieBoxPhonePatch = bytecodePatch(
@@ -35,10 +35,9 @@ val movieBoxPhonePatch = bytecodePatch(
     description = "Unlocks VIP premium, removes ads and upsells, bypasses region lock " +
         "and force update, unlocks HD and downloads, enables 5 parallel downloads."
 ) {
-    compatibleWith(MOVIEBOX_COMPATIBILITY,MOVIEBOXIN_COMPATIBILITY)
+    compatibleWith(MOVIEBOX_COMPATIBILITY, MOVIEBOXIN_COMPATIBILITY)
 
     execute {
-
         val returnTrue = "const/4 v0, 0x1\nreturn v0"
         val returnFalse = "const/4 v0, 0x0\nreturn v0"
         val returnIntMax = "const/high16 v0, 0x7fff0000\nreturn v0"
@@ -68,9 +67,6 @@ val movieBoxPhonePatch = bytecodePatch(
         }
 
         // ─── MemberInfo — full member detail bean ────────────────────
-        // isActive()Z (primitive), getDaysLeft/getExpiryDate suppress Renew button.
-        // daysLeft=9999 > 7 (threshold) → no Renew in MemberGuideBannerView or f0.B().
-        // getVipLevel is NOT on MemberInfo — it has getMemberType()I.
         cls = mutableClassDefByOrNull("Lcom/transsion/memberapi/MemberInfo;")
             ?: throw PatchException("MemberInfo not found")
         cls.methods.firstOrNull {
@@ -105,59 +101,88 @@ val movieBoxPhonePatch = bytecodePatch(
             it.name == "getExpiryDate" && it.returnType == "Ljava/lang/String;" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, "const-string v0, \"2099-12-31\"\nreturn-object v0")
 
-        // ─── MemberProvider — MMKV membership flag cache ─────────────
-        // c()Z = isActive wrapper
-        // f()Z = kv_is_pay_enable_member
-        // g()Z = kv_is_skip_ad
-        // x(F)V = showMemberDialog upsell popup → noop
-        // D()I = kv_parallel_download_task_num → 5
+        // ─── MemberProvider — UPDATED FOR v4.0.02.0903.02 ────────────
         cls = mutableClassDefByOrNull("Lcom/transsion/member/MemberProvider;")
             ?: throw PatchException("MemberProvider not found")
-        cls.methods.firstOrNull { it.name == "c" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
-            ?.addInstructions(0, returnTrue) ?: throw PatchException("MemberProvider.c()Z not found")
-        cls.methods.firstOrNull { it.name == "f" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
-            ?.addInstructions(0, returnTrue) ?: throw PatchException("MemberProvider.f()Z not found")
+
+        // isActive - B()Z (was c()Z)
+        cls.methods.firstOrNull { it.name == "B" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("MemberProvider.isActive (B()Z) not found")
+
+        // kv_is_pay_enable_member - h()Z (was f()Z)
+        cls.methods.firstOrNull { it.name == "h" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("MemberProvider.pay_enable (h()Z) not found")
+
+        // kv_is_skip_ad - g()Z (unchanged)
         cls.methods.firstOrNull { it.name == "g" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
-            ?.addInstructions(0, returnTrue) ?: throw PatchException("MemberProvider.g()Z not found")
-        cls.methods.firstOrNull { it.name == "x" && it.returnType == "V" && it.parameterTypes == listOf("F") }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("MemberProvider.skip_ad (g()Z) not found")
+
+        // showMemberDialog - z(F)V (was x(F)V)
+        cls.methods.firstOrNull { it.name == "z" && it.returnType == "V" && it.parameterTypes == listOf("F") }
             ?.apply { clearBody(); addInstructions(0, "return-void") }
-            ?: throw PatchException("MemberProvider.x(F)V not found")
+            ?: throw PatchException("MemberProvider.showMemberDialog (z(F)V) not found")
+
+        // parallel_download_task_num - D()I (unchanged)
         cls.methods.firstOrNull { it.name == "D" && it.returnType == "I" && it.parameterTypes.isEmpty() }
             ?.addInstructions(0, "const/4 v0, 0x5\nreturn v0")
+            ?: throw PatchException("MemberProvider.parallel_download (D()I) not found")
 
-        // ─── PremiumProvider — entitlement quota and feature gates ───
-        // c()Z  isActive wrapper → true
-        // k()Z  isVip (vipLevel==1) → true
-        // u()Z  isSVip (vipLevel==2) → true (drives "TV Pro" gold label via f0.B())
-        // o()   daysLeft backup for player paths → 9999
-        // f()I  free_download_count → Int.MAX_VALUE
-        // i()I  per_download_resource_count → 5
-        // t()I  max_resolution → Int.MAX_VALUE
-        // w()I  preview_seconds → Int.MAX_VALUE
-        // x()I  free_hd_preview_count → Int.MAX_VALUE
+        // ─── PremiumProvider — UPDATED FOR v4.0.02.0903.02 ────────────
         cls = mutableClassDefByOrNull("Lcom/transsion/member/premium/PremiumProvider;")
             ?: throw PatchException("PremiumProvider not found")
-        for (name in listOf("c", "k", "u")) {
-            cls.methods.firstOrNull { it.name == name && it.returnType == "Z" && it.parameterTypes.isEmpty() }
-                ?.addInstructions(0, returnTrue)
-        }
-        cls.methods.firstOrNull { it.name == "o" && it.returnType == "Ljava/lang/Integer;" && it.parameterTypes.isEmpty() }
+
+        // isActive - b()Z (was c()Z)
+        cls.methods.firstOrNull { it.name == "b" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("PremiumProvider.isActive (b()Z) not found")
+
+        // isVip - j()Z (was k()Z)
+        cls.methods.firstOrNull { it.name == "j" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("PremiumProvider.isVip (j()Z) not found")
+
+        // isSVip - u()Z (unchanged)
+        cls.methods.firstOrNull { it.name == "u" && it.returnType == "Z" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnTrue)
+            ?: throw PatchException("PremiumProvider.isSVip (u()Z) not found")
+
+        // daysLeft - n()Ljava/lang/Integer; (was o())
+        cls.methods.firstOrNull { it.name == "n" && it.returnType == "Ljava/lang/Integer;" && it.parameterTypes.isEmpty() }
             ?.addInstructions(0, returnInt9999)
+            ?: throw PatchException("PremiumProvider.daysLeft (n()Integer) not found")
+
+        // free_download_count - f()I (unchanged)
         cls.methods.firstOrNull { it.name == "f" && it.returnType == "I" && it.parameterTypes.isEmpty() }
             ?.addInstructions(0, returnIntMax)
-        cls.methods.firstOrNull { it.name == "i" && it.returnType == "I" && it.parameterTypes.isEmpty() }
+            ?: throw PatchException("PremiumProvider.free_download_count (f()I) not found")
+
+        // per_download_resource_count - h()I (was i()I)
+        cls.methods.firstOrNull { it.name == "h" && it.returnType == "I" && it.parameterTypes.isEmpty() }
             ?.addInstructions(0, "const/4 v0, 0x5\nreturn v0")
-        for (name in listOf("t", "w", "x")) {
-            cls.methods.firstOrNull { it.name == name && it.returnType == "I" && it.parameterTypes.isEmpty() }
-                ?.addInstructions(0, returnIntMax)
-        }
+            ?: throw PatchException("PremiumProvider.per_download_resource_count (h()I) not found")
+
+        // max_resolution - t()I (unchanged)
+        cls.methods.firstOrNull { it.name == "t" && it.returnType == "I" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnIntMax)
+            ?: throw PatchException("PremiumProvider.max_resolution (t()I) not found")
+
+        // preview_seconds - w()I (unchanged)
+        cls.methods.firstOrNull { it.name == "w" && it.returnType == "I" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnIntMax)
+            ?: throw PatchException("PremiumProvider.preview_seconds (w()I) not found")
+
+        // free_hd_preview_count - x()I (unchanged)
+        cls.methods.firstOrNull { it.name == "x" && it.returnType == "I" && it.parameterTypes.isEmpty() }
+            ?.addInstructions(0, returnIntMax)
+            ?: throw PatchException("PremiumProvider.free_hd_preview_count (x()I) not found")
 
         // ─── NationalInformationManager — country code spoof ─────────
-        // e()Ljava/lang/String; reads MMKV "sp_code" (SIM MCC).
-        // "90101" = Transsion test MCC → BFF returns {isPassed:true, vipEnable:true}
-        // → no 471/472 responses → no region-block redirects → app stays responsive.
         cls = mutableClassDefByOrNull("Lcom/transsion/ad/strategy/NationalInformationManager;")
             ?: throw PatchException("NationalInformationManager not found")
+        // e()Ljava/lang/String; (unchanged)
         cls.methods.firstOrNull {
             it.name == "e" && it.returnType == "Ljava/lang/String;" && it.parameterTypes.isEmpty()
         }?.addInstructions(0, "const-string v0, \"90101\"\nreturn-object v0")
@@ -216,9 +241,6 @@ val movieBoxPhonePatch = bytecodePatch(
             }?.addInstructions(0, "const/4 v0, 0x0\nreturn v0")
 
         // ─── ShortTV live stream paywall — getNeedPaid()I → 0 ────────
-        // ShortTVItem.needPaid: nonzero = paid content → starts 10-min countdown
-        // then calls watchAdToUnlock → SceneInterceptManager("ShortTvPlayerUnlockPlayScene")
-        // Returning 0 marks all live/short-TV content as free → no countdown starts.
         for (className in listOf(
             "Lcom/transsion/shorttv/bean/ShortTVItem;",
             "Lcom/transsion/shorttv/bean/Subject;",
@@ -230,12 +252,6 @@ val movieBoxPhonePatch = bytecodePatch(
         }
 
         // ─── AppLifeStatusInterceptor — region bypass ─────────────────
-        // i(String,String)V — dialog popup via interface g (code 472)
-        // j(String,String)V — TheRouter route to /main/page_not_available (code 471)
-        // k(String)V        — TheRouter redirect (code 403)
-        // n(Chain)Z         — freeze flag setter → false (prevents AtomicBoolean freeze)
-        // Combined with NationalInformationManager.e()="90101": BFF returns success
-        // so 471/472/403 never fire. These noops are belt-and-suspenders.
         val interceptor = mutableClassDefByOrNull("Lcom/transsion/baselib/net/AppLifeStatusInterceptor;")
             ?: throw PatchException("AppLifeStatusInterceptor not found")
         interceptor.methods.firstOrNull {
@@ -269,8 +285,6 @@ val movieBoxPhonePatch = bytecodePatch(
             }
 
         // ─── Scene ad removal — SceneInterceptManager ─────────────────
-        // Suspend gate for all scene ads including ShortTvPlayerUnlockPlayScene
-        // (the live stream "go premium" overlay). Returns Pair(true,"no ads").
         mutableClassDefByOrNull("Lcom/transsion/ad/scene/SceneInterceptManager;")
             ?.methods?.firstOrNull {
                 it.name == "a" && it.returnType == "Ljava/lang/Object;" &&
